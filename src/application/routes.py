@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from application.models import Admin
-from application.forms import AdminLoginForm
+from application.forms import AdminLoginForm, NewAdminForm
 from application import app
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -24,11 +24,22 @@ def adm_home():
     return render_template('adminhome.html', month = month_revenue, annual = annual_revenue)
 
 #@login_required
-@app.route('/new-item')
-def adm_new_item():
-    return render_template('')
+@app.route('/new-admin')
+def adm_new_admin():
+    form = NewAdminForm()
+    roles = (['admin', 'admin'])
+    if Admin.query.filter_by(user_id = current_user.user_id).first().level == 'owner':
+        roles.append(['owner', 'owner'])
+    if form.validate_on_submit():
+        Data = Admin(first_name = form.first_name.data, last_name = form.last_name.data, email = form.email.data, password = bcrypt.generate_password_has(form.password.data), level = form.level.data)
+        db.session.add(Data)
+        db.session.commit()
+        return redirect(url_for('adm_home'))
+    else:
+        print(form.errors)
+    return render_template('newadmin.html', form = form)
 
-#@loogut_required
+#@login_required
 @app.route('/logout')
 def adm_logout():
     logout_user()
