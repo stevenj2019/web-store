@@ -17,4 +17,4 @@ class AdminLoginForm(FlaskForm):
             Email()
         ]
     )
-    submit = SubmitField('Login')
+    submit = SubmitField('')
