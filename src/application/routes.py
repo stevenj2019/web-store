@@ -15,5 +15,13 @@ def adm_login():
         else:
             print(form.errors)
     return render_template('adminlogin.html', form=form)
-#@app.route('/adm-home')
-#def adm_home():
+#@login_required
+@app.route('/adm-home')
+def adm_home():
+    month_revenue = 0
+    annual_revenue = 0
+    return render_template('adminhome.html', month = month_revenue, annual = annual_revenue)
+#@login_required
+@app.route('/new-item')
+def adm_new_item():
+    return render_template('')
