@@ -10,5 +10,5 @@ class Admin(db.Model, UserMixin):
     level = db.Column(db.String(10), nullable = False)
 
 @login_manager.user_loader
-def load_user(user):
-    return User.get(user)
+def load_user(id):
+    return Admin.query.get(int(id))

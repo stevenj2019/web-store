@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, request
 from flask_login import login_user, current_user, logout_user, login_required
 from application.models import Admin
 from application.forms import AdminLoginForm, AdminForm, ResetPasswordForm
-from application import app
+from application import app, bcrypt, db
 
 @app.route('/admin', methods=['GET', 'POST'])
 def adm_login():
@@ -10,8 +10,8 @@ def adm_login():
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.email.data).first()
         if admin and bcrypt.check_password_hash(admin.password, form.password.data):
-            login_user(user)
-            return redirect(url_for('adm-home'))
+            login_user(admin)
+            return redirect(url_for('adm_home'))
         else:
             print(form.errors)
     return render_template('adminlogin.html', form=form)
@@ -39,7 +39,7 @@ def adm_new_admin():
         print(form.errors)
     return render_template('adminform.html', form = form, title = "New Admin", form_title ="Create a New Admin User")
 
-@app.route('reset-password')
+@app.route('/reset-password', methods=['GET', 'POST'])
 def adm_password_reset():
     form = ResetPasswordForm()
     admin = Admin.query.filter_by(id=current_user.id).first()
@@ -47,8 +47,6 @@ def adm_password_reset():
         if admin and bcrypt.check_password_hash(admin.password, form.old_password.data):
             admin.password = bcrypt.generate_password_hash(form.new_password.data)
             db.session.commit()
-        else:
-            form.errors.append('incorrect password supplied')
     else:
         print(form.errors)
     return render_template('resetpassword.html', form = form, title="Reset Password")
